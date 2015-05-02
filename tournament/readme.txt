@@ -10,18 +10,16 @@ Folders/Files present:
 		Contains -
 			i)tournament.py - contains operations like creating connection with db ,insert,delete,update etc
 			ii)tournament.sql - contains sql commands for creating tables,triggers and views
-			iii)tournament_test.py - contains methods to 
-										a)get the player standings,
-									    c)perform swiss pairings etc.
+			iii)tournament_test.py - contains methods to a)get the player standings,
+							             b)perform swiss pairings etc.
 
 2) tournament_credit - 
 		Contains -
 			i)tournament.py - contains operations like creating connection with db ,insert,delete,update etc
 			ii)tournament_swiss.sql - contains sql commands for creating tables,triggers and views
-			iii)tournament_test.py - contains methods to 
-										a)get winner of the tournament,
-										b)get rank of each players at the end of tournament,
-									    c)perform swiss pairings etc.
+			iii)tournament_test.py - contains methods to a)get winner of the tournament,
+								     b)get rank of each players at the end of tournament,
+							             c)perform swiss pairings etc.
 Working and Set up
 -----------------------
 Required - Git - Unix-style terminal and shell (Git Bash) to acces the folders present i remote system
