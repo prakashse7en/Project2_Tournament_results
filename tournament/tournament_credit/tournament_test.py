@@ -101,14 +101,17 @@ def testStandingsBeforeMatches():
         raise ValueError("Only registered players should appear in standings.")
     if len(standings[0]) != 5:
         raise ValueError("Each playerStandings row should have four columns.")
-    [(id1, name1, wins1, matches1, tid1), (id2, name2, wins2, matches2, tid2)] = standings
+    [(id1, name1, wins1, matches1, tid1),
+     (id2, name2, wins2, matches2, tid2)] = standings
     if matches1 != 0 or matches2 != 0 or wins1 != 0 or wins2 != 0:
         raise ValueError(
             "Newly registered players should have no matches or wins.")
     if set([name1, name2]) != set(["Melpomene Murray", "Randy Schwartz"]):
-        raise ValueError("Registered players' names should appear in standings, "
-                         "even if they have no matches played.")
-    print "6. Newly registered players appear in the standings with no matches."
+        raise ValueError("""Registered players' names should
+                            appear in standings, even if they
+                            have no matches played.""")
+    print """6. Newly registered players appear in the standings
+             with no matches."""
 
 
 def testReportMatches():
@@ -140,7 +143,8 @@ def testReportMatches():
         if i in (id1, id3) and w != 1:
             raise ValueError("Each match winner should have one win recorded.")
         elif i in (id2, id4) and w != 0:
-            raise ValueError("Each match loser should have zero wins recorded.")
+            raise ValueError("""Each match loser should have
+                                zero wins recorded.""")
     print "7. After a match, players have updated standings."
 
 
@@ -206,22 +210,28 @@ def getWinnerOfTournament():
         else:
             playerToBeRemoved = None
             for j in range(0, (len(standings)/2)):
-                opponentIds = getOpponent(standings[j][0], 1, playerToBeRemoved)
+                opponentIds = getOpponent(standings[j][0],
+                                          1, playerToBeRemoved)
                 if (len(opponentIds) > 0):
-                    playersPositions = getPerfectOpponent(opponentIds, tournamentId)
+                    playersPositions = getPerfectOpponent(opponentIds,
+                                                          tournamentId)
                     rankingDict = {}
-                    rankingDict = rankBasedOnPlayerPosition(rankingDict, playersPositions)
-                    sortedValuesByWins = sorted(rankingDict.items(), key=itemgetter(1))
+                    rankingDict = rankBasedOnPlayerPosition(rankingDict,
+                                                            playersPositions)
+                    sortedValuesByWins = sorted(rankingDict.items(),
+                                                key=itemgetter(1))
                     randomPlayerId = getEligiblePlayer(sortedValuesByWins)
                     reportMatch(standings[j][0], randomPlayerId[0], 1)
                     # code to remove the played people
                     playerToBeRemoved = randomPlayerId[0]
-                    tupleTobeRemoved = [i for i, v in enumerate(standings) if v[0] == randomPlayerId[0]]
+                    tupleTobeRemoved = [i for i, v in enumerate(standings)
+                                        if v[0] == randomPlayerId[0]]
                     standings.remove(standings[tupleTobeRemoved[0]])
                 else:
                     reportMatch(standings[j][0], opponentIds[0], 1)
                     playerToBeRemoved = opponentIds[0]
-                    tupleTobeRemoved = [i for i, v in enumerate(standings) if v[0] == opponentIds[0]]
+                    tupleTobeRemoved = [i for i, v in enumerate(standings)
+                                        if v[0] == opponentIds[0]]
                     standings.remove(standings[tupleTobeRemoved[0]])
     print "9. Winner is found."
     reportWinner(1)
@@ -314,7 +324,8 @@ def createInputs(tournamentId):
 
 def rankBasedOnOMW():
     """method is used to rank the players based on OMW.
-    Here players with common wins are retreived and they are ranked based on OMW
+    Here players with common wins are retreived and
+    they are ranked based on OMW,
     i.e ,total wins of each opponenets players played against
     is calculated and the total value is used to rank the players with common
     wins,player inputs is used from getWinnerOfTournament()"""
@@ -329,7 +340,8 @@ def rankBasedOnOMW():
         rankingDict = rankBasedOnPlayerPosition(rankingDict, playersPositions)
         # displaying the dict ordering values by descending order
         sortedValuesByWins = sorted(rankingDict.items(), key=itemgetter(1))
-        playersByRankList = reorderPositions(playersByRankList, sortedValuesByWins)
+        playersByRankList = reorderPositions(playersByRankList,
+                                             sortedValuesByWins)
     displayFinalList(playersByRankList)
 
 
@@ -373,11 +385,11 @@ def displayFinalList(playersByRankList):
     """method is used to display the final postions of the players based on the
     wins.
     Args:
-    playersByRankList - orginal list of players fetched from db in which players
-    with common winns are ordered"""
+    playersByRankList - orginal list of players fetched from db
+                        in which players with common winns are ordered"""
     bufferPlayersByRankList = [list(i) for i in playersByRankList]
     for i in range(0, len(playersByRankList)):
-        bufferPlayersByRankList[i][1] = str(bufferPlayersByRankList[i][1])+' Position'
+        bufferPlayersByRankList[i][1] = str(bufferPlayersByRankList[i][1]) + ' Position'
     print '10.printing the final standing list based on OMW'
     print bufferPlayersByRankList
 
@@ -386,8 +398,8 @@ def reorderPositions(playersByRankList, sortedValuesByWins):
     """method is used to reorder the positions of players with common wins based
     on values present in sortedValuesByWins
     Args:
-    playersByRankList - orginal list of players fetched from db in which players
-    with common winns are un ordered
+    playersByRankList - orginal list of players fetched from
+    db in which players with common winns are un ordered
     sortedValuesByWins - ordered list of players with common wins"""
     bufferPlayersByRankList = [list(i) for i in playersByRankList]
     bufferSortedValuesByWins = [list(i) for i in sortedValuesByWins]
