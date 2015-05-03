@@ -4,6 +4,8 @@
 
 CREATE DATABASE swiss_tournament;
 
+\c swiss_tournament;
+
 CREATE  TABLE PLAYERS (
   P_ID SERIAL PRIMARY KEY ,
   PLAYER_NAME VARCHAR(45) NULL);
