@@ -15,8 +15,7 @@ __license__ = "Prakash"
 def insertBye(idOfPlayer, tournament):
     """increments wins and total matches of the player by 1 as it is a bye.
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute(""" UPDATE player_tournament_stats SET (WINS) =
                 ((player_tournament_stats.WINS + 1)) ,(TOTAL_MATCHES) =
                 ((player_tournament_stats.TOTAL_MATCHES + 1))
@@ -28,8 +27,7 @@ def insertBye(idOfPlayer, tournament):
 
 def reportWinner(tournamentId):
     """returns the winner of the tournament"""
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("""select PLAYER_NAME from PLAYERS where P_ID=
               (select PLAYER_ID  from  player_tournament_stats where wins =
               (select MAX(wins) from player_tournament_stats) and
@@ -44,8 +42,7 @@ def reportWinner(tournamentId):
 def restartSequence():
     """reintialises the id values of table player_tournament_stats,
     PLAYERS,FIXTURES,PLAYER_REGISTERED to 1 """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("ALTER SEQUENCE player_tournament_stats_ID_seq RESTART WITH 1;")
     c.execute("ALTER SEQUENCE PLAYERS_P_ID_seq RESTART WITH 1;")
     c.execute("ALTER SEQUENCE FIXTURES_ID_seq RESTART WITH 1;")
@@ -56,13 +53,17 @@ def restartSequence():
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=swiss_tournament")
+    try:
+        db = psycopg2.connect("dbname=swiss_tournament")
+        cursor = db.cursor()
+        return db, cursor
+    except:
+        print("connection failed due to inncorrect db name")
 
 
 def deleteMatches():
     """Remove all the match records from the database."""
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     query = "delete from player_tournament_stats;"
     c.execute(query)
     c.execute("delete from FIXTURES;")
@@ -72,8 +73,7 @@ def deleteMatches():
 
 def deleteTournament():
     """Remove all the players registerd for the tournament."""
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("delete from PLAYER_REGISTERED;")
     query = "delete from tournament;"
     c.execute(query)
@@ -83,8 +83,7 @@ def deleteTournament():
 
 def registerPlayerForTournament(playerName, tId):
     """adds players id value into player_registered table"""
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("select p_id from PLAYERS where(PLAYER_NAME=%s);", [playerName])
     player = c.fetchall()
     c.execute("""insert into PLAYER_REGISTERED(PLAYER_ID,TOURNAMENT_ID) VALUES
@@ -96,8 +95,7 @@ def registerPlayerForTournament(playerName, tId):
 def deletePlayers():
     """Remove all the player records from the database."""
     deleteMatches()
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     query = "delete from players;"
     c.execute(query)
     DB.commit()
@@ -106,8 +104,7 @@ def deletePlayers():
 
 def countPlayers(tournamentId):
     """Returns the number of players currently registered."""
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("""select count(player_id) as players_count from PLAYER_REGISTERED
                  where (TOURNAMENT_ID=%s);""", [tournamentId])
     noOfRows = c.fetchone()
@@ -122,8 +119,7 @@ def registerPlayer(name):
     Args:
       name: the player's full name (need not be unique).
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("insert into players(player_name) VALUES (%s)", [name])
     DB.commit()
     DB.close()
@@ -140,8 +136,7 @@ def playerStandings(tournamentId):
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     """ PLAYERS_STANDINGS is a view """
     c.execute("""select * from PLAYERS_STANDINGS WHERE (tournament_id=%s);
                  """, [tournamentId])
@@ -158,8 +153,7 @@ def reportMatch(winner, loser, tId):
       loser:  the id number of the player who lost
       tId: tournament id in which match is played
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute(""" UPDATE player_tournament_stats SET (WINS) =
               ((player_tournament_stats.WINS + 1)) ,
             (TOTAL_MATCHES) = ((player_tournament_stats.TOTAL_MATCHES + 1))
@@ -178,8 +172,7 @@ def distintWinsValue(tournamentId):
     Args:
       tournamentId: tournament id in which match is played
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     """ PLAYERS_WITH_COMMONWINS is a view """
     c.execute("""select distinct wins from PLAYERS_WITH_COMMON_WINS where
              (TOURNAMENT_ID = %s)""", [tournamentId])
@@ -200,8 +193,7 @@ def playersStandingsOMWSimple(winNo, tournamentId):
     winNo - win value
     tournamentId: tournament id in which match is played
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     """ PLAYERS_WITH_COMMONWINS is a view """
     c.execute("""select player_id from PLAYERS_WITH_COMMON_WINS  WHERE (wins=%s)
               and (TOURNAMENT_ID = %s) """, [(winNo), (tournamentId)])
@@ -242,8 +234,7 @@ def getRankBasedOnWins(tournamentId):
     Args:
     tournamentId: tournament id in which match is played
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("""SELECT PLAYER_ID, rank() OVER (ORDER BY wins DESC)
                 FROM player_tournament_stats where (tournament_id=%s);
                 """, [tournamentId])
@@ -266,8 +257,7 @@ def swissPairings(tournamentId):
         id2: the second player's unique id
         name2: the second player's name
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("""select * from PLAYERS_STANDINGS WHERE
              (tournament_id=%s);""", [tournamentId])
     rowsFetched = c.fetchall()
@@ -295,9 +285,7 @@ def getOpponent(playerId, tournamentId, playerToBeRemoved):
     removed from the list of values from fetched from db
     based on total matches played ,wins and tournament
     """
-    DB = connect()
-    c = DB.cursor()
-
+    DB, c = connect()
     c.execute("""select total_matches from player_tournament_stats
                  where (player_id = %s);""", [(playerId)])
     totalMatches = c.fetchall()
@@ -343,8 +331,7 @@ def getPlayerWithNearestWin(playerId,
     based on total matches played ,wins and tournament
     totalMatches - total matches played in the tournament
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("""select player_id from player_tournament_stats where wins <
             (select wins from player_tournament_stats where (player_id = %s)
             and (tournament_id=%s)) and (player_id != %s)
@@ -387,8 +374,7 @@ def getPerfectOpponent(opponentIds, tournamentId):
     tournamentId: tournament id in which match is played
     opponentIds - list of ids be played against the player
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     playerIds = opponentIds
     # below variable is used to calculate the total wins
     buffer_total_wins = 0
@@ -430,8 +416,7 @@ def removeDuplicateOpponents(playerId, opponentIds, tournamentId):
     opponentIds - list of ids be played against the player
     tournamentId: tournament id in which match is played
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("""select case when (team_1  = %s)  then team_2 else team_1 end
        as opposing_team from fixtures where ((team_1  = %s) or (team_2 = %s))
        and (TOURNAMENT_ID = %s); """, [(playerId),
@@ -460,8 +445,7 @@ def getWinsInEntireTournament(playerId):
     """ returns the total wins of the player in all tournaments played
     Args:
     playerId - player id of the player"""
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("""select sum(wins) from player_tournament_stats where
                (player_id=%s) """, [playerId])
     wins = c.fetchall()
@@ -476,8 +460,7 @@ def createTournament(tournamentNumber):
     Args:
     tournamentNumber: tournament id in which match is played
     """
-    DB = connect()
-    c = DB.cursor()
+    DB, c = connect()
     c.execute("insert into tournament(T_ID) VALUES (%s)", [tournamentNumber])
     DB.commit()
     DB.close()
