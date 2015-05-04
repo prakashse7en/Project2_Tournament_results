@@ -56,4 +56,8 @@ CREATE TRIGGER AUTO_INSERT_TRIGGER
 ------------------------
 -------------queries
 CREATE VIEW PLAYERS_STANDINGS AS
-select player_tournament_stats.PLAYER_ID,PLAYERS.PLAYER_NAME,player_tournament_stats.WINS,player_tournament_stats.TOTAL_MATCHES,player_tournament_stats.TOURNAMENT_ID from player_tournament_stats inner join PLAYERS on  player_tournament_stats.PLAYER_ID = players.P_ID  order by player_tournament_stats.wins desc,player_tournament_stats.PLAYER_ID asc;
+select player_tournament_stats.PLAYER_ID,PLAYERS.PLAYER_NAME,
+  player_tournament_stats.WINS,player_tournament_stats.TOTAL_MATCHES,
+  player_tournament_stats.TOURNAMENT_ID from player_tournament_stats 
+  inner join PLAYERS on  player_tournament_stats.PLAYER_ID = players.P_ID  
+  order by player_tournament_stats.wins desc,player_tournament_stats.PLAYER_ID asc;
