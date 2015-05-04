@@ -465,3 +465,4 @@ def createTournament(tournamentNumber):
     c.execute("insert into tournament(T_ID) VALUES (%s)", [tournamentNumber])
     DB.commit()
     DB.close()
+
