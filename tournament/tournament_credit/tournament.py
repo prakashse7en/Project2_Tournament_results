@@ -43,9 +43,7 @@ def restartSequence():
     """reintialises the id values of table player_tournament_stats,
     PLAYERS,FIXTURES,PLAYER_REGISTERED to 1 """
     DB, c = connect()
-    c.execute("ALTER SEQUENCE player_tournament_stats_ID_seq RESTART WITH 1;")
     c.execute("ALTER SEQUENCE PLAYERS_P_ID_seq RESTART WITH 1;")
-    c.execute("ALTER SEQUENCE FIXTURES_ID_seq RESTART WITH 1;")
     c.execute("ALTER SEQUENCE PLAYER_REGISTERED_ID_seq RESTART WITH 1;")
     DB.commit()
     DB.close()
