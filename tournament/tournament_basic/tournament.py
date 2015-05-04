@@ -27,7 +27,6 @@ def restartSequence():
     DB = connect();
     c = DB.cursor()
     
-    c.execute("ALTER SEQUENCE PLAYER_RECORDS_ID_seq RESTART WITH 1;")
     c.execute("ALTER SEQUENCE PLAYERS_P_ID_seq RESTART WITH 1;")
     DB.commit()
     DB.close()    
