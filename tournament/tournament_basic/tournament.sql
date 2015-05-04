@@ -11,11 +11,10 @@ CREATE  TABLE PLAYERS (
   PLAYER_NAME VARCHAR(45) NULL);
 ----------------------------------  
 CREATE TABLE player_records (
-  ID SERIAL PRIMARY KEY,
   PLAYER_ID integer references PLAYERS(P_ID),
   WINS integer DEFAULT NULL,
   TOTAL_MATCHES integer DEFAULT NULL
-) 
+);
 		  
 
 -----------------------------------------
