@@ -3,7 +3,6 @@
 
 
 CREATE DATABASE swiss_tournament;
-
 \c swiss_tournament;
 
 CREATE  TABLE PLAYERS (
@@ -23,7 +22,6 @@ CREATE TABLE PLAYER_REGISTERED (
 ------------------------------------- 
 
 CREATE TABLE player_tournament_stats (
-  ID SERIAL PRIMARY KEY,
   PLAYER_ID integer references PLAYERS(P_ID),
   WINS integer DEFAULT NULL,
   TOTAL_MATCHES integer DEFAULT NULL,
@@ -31,7 +29,6 @@ CREATE TABLE player_tournament_stats (
 ); 
 ---------------------------------------------
 CREATE TABLE FIXTURES (
-  ID SERIAL PRIMARY KEY,
   TEAM_1 integer references PLAYERS(P_ID),
   TEAM_2 integer references PLAYERS(P_ID),
   TOURNAMENT_ID integer references TOURNAMENT(T_ID)  
@@ -60,10 +57,3 @@ CREATE TRIGGER AUTO_INSERT_TRIGGER
 -------------queries
 CREATE VIEW PLAYERS_STANDINGS AS
 select player_tournament_stats.PLAYER_ID,PLAYERS.PLAYER_NAME,player_tournament_stats.WINS,player_tournament_stats.TOTAL_MATCHES,player_tournament_stats.TOURNAMENT_ID from player_tournament_stats inner join PLAYERS on  player_tournament_stats.PLAYER_ID = players.P_ID  order by player_tournament_stats.wins desc,player_tournament_stats.PLAYER_ID asc;
-
-
-create view PLAYERS_WITH_COMMON_WINS AS
-select wins from player_tournament_stats where wins in (
-    select wins from player_tournament_stats group by wins having count(*) > 1
-
-        ) order by wins desc;
