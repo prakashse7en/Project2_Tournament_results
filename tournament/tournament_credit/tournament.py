@@ -174,8 +174,11 @@ def distintWinsValue(tournamentId):
     """
     DB, c = connect()
     """ PLAYERS_WITH_COMMONWINS is a view """
-    c.execute("""select distinct wins from PLAYERS_WITH_COMMON_WINS where
-             (TOURNAMENT_ID = %s)""", [tournamentId])
+    c.execute("""select distinct wins from player_tournament_stats where wins in
+                (select wins from player_tournament_stats where
+                tournament_id in (select wins  from player_tournament_stats
+                where (tournament_id = %s)) group by wins having count(*) > 1)
+                order by wins desc;""", [tournamentId])
     distinctWinsList = c.fetchall()
     DB.commit()
     DB.close()
@@ -195,7 +198,7 @@ def playersStandingsOMWSimple(winNo, tournamentId):
     """
     DB, c = connect()
     """ PLAYERS_WITH_COMMONWINS is a view """
-    c.execute("""select player_id from PLAYERS_WITH_COMMON_WINS  WHERE (wins=%s)
+    c.execute("""select player_id from player_tournament_stats  WHERE (wins=%s)
               and (TOURNAMENT_ID = %s) """, [(winNo), (tournamentId)])
     playerIds = c.fetchall()
     buffer_total_wins = 0
